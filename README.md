@@ -26,7 +26,7 @@ _Total Weight: 100%_
 2. **Ray Serve** (with KubeRay)
 3. **Triton Inference Server**
 4. **Seldon Core**
-5. **BentoML (with OpenLLM)**
+5. **BentoML** (with OpenLLM)
 6. **TorchServe**
 7. **MLServer**
 8. **Neural Magic**

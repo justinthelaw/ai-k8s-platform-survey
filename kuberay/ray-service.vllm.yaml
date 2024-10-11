@@ -54,7 +54,7 @@ spec:
                   name: serve
     workerGroupSpecs:
       - replicas: 1
-        minReplicas: 0
+        minReplicas: 1
         maxReplicas: 7
         groupName: tiny-llama-pack
         rayStartParams: {}

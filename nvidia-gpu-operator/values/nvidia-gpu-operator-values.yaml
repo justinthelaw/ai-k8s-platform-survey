@@ -5,9 +5,8 @@ platform:
   openshift: false
 
 nfd:
-  # usually enabled by default, but choose to use external NFD from IronBank
   enabled: true
-  nodefeaturerules: false
+  nodefeaturerules: true
 
 psa:
   enabled: false

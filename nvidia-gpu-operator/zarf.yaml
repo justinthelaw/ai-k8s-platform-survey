@@ -40,3 +40,21 @@ components:
                 # Ensure the NVIDIA host validator job succeeds
                 condition: "'{.status.conditions[2].status}'=True"
             maxTotalSeconds: 300
+
+  - name: time-slicing
+    description: "Add a time-slicing configuration for the GPU operator"
+    required: false
+    manifests:
+      - name: time-slicing-config
+        files:
+          - manifests/time-slicing-config.yaml
+        namespace: kube-system
+    actions:
+      onDeploy:
+        after:
+          - description: "Attach the time-slicing configuration to the GPU Operator"
+            cmd: |
+              uds zarf tools kubectl patch clusterpolicies.nvidia.com/cluster-policy \
+                -n kube-system --type merge \
+                -p '{"spec": {"devicePlugin": {"config": {"name": "time-slicing-config-all", "default": "any"}}}}'
+              uds zarf tools kubectl rollout restart -n kube-system daemonset/nvidia-device-plugin-daemonset

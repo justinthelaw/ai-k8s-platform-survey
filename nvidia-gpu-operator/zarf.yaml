@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/defenseunicorns/zarf/main/zarf.schema.json
+
+kind: ZarfPackageConfig
+metadata:
+  name: nvidia-gpu-operator
+  description: "NVIDIA GPU Operator"
+  url: https://github.com/defenseunicorns/uds-package-nvidia-gpu-operator
+  yolo: true
+  version: "0.1.0"
+
+components:
+  - name: nvidia-gpu-operator
+    description: "Install the NVIDIA GPU Operator for CUDA-enabled clusters"
+    required: true
+    charts:
+      - name: gpu-operator
+        url: https://helm.ngc.nvidia.com/nvidia
+        version: v24.6.2
+        namespace: kube-system
+        valuesFiles:
+          - "values/nvidia-gpu-operator-values.yaml"
+    actions:
+      onDeploy:
+        after:
+          - description: "Validate nvidia-device-plugin-daemonset is up"
+            wait:
+              cluster:
+                kind: Pod
+                name: app=nvidia-device-plugin-daemonset
+                namespace: kube-system
+                # Ensure the device plugin is healthy, which might take a while depending on the machine
+                condition: "'{.status.conditions[2].status}'=True"
+            maxTotalSeconds: 600
+          - description: "Validate nvidia-operator-validator is completed"
+            wait:
+              cluster:
+                kind: Pod
+                name: app=nvidia-operator-validator
+                namespace: kube-system
+                # Ensure the NVIDIA host validator job succeeds
+                condition: "'{.status.conditions[2].status}'=True"
+            maxTotalSeconds: 300

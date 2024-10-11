@@ -1,18 +1,22 @@
 apiVersion: ray.io/v1
 kind: RayService
 metadata:
-  name: tiny-llama
+  name: vllm
 spec:
   serveConfigV2: |
     applications:
-    - name: llm
+    - name: tiny-llama
       route_prefix: /
       import_path:  ray-operator.config.samples.vllm.serve:model
       deployments:
       - name: VLLMDeployment
-        num_replicas: 1
+        max_ongoing_requests: 2
+        autoscaling_config:
+          target_ongoing_requests: 1
+          min_replicas: 1
+          max_replicas: 9
         ray_actor_options:
-          num_cpus: 8
+          num_cpus: 4
           # NOTE: num_gpus is set automatically based on TENSOR_PARALLELISM
       runtime_env:
         working_dir: "https://github.com/ray-project/kuberay/archive/master.zip"
@@ -22,9 +26,11 @@ spec:
           TENSOR_PARALLELISM: "1"
           PIPELINE_PARALLELISM: "1"
   rayClusterConfig:
+    enableInTreeAutoscaling: true
     headGroupSpec:
       rayStartParams:
         dashboard-host: "0.0.0.0"
+        num-cpus: "0"
       template:
         spec:
           containers:
@@ -48,15 +54,15 @@ spec:
                   name: serve
     workerGroupSpecs:
       - replicas: 1
-        minReplicas: 1
-        maxReplicas: 1
-        groupName: gpu-group
+        minReplicas: 0
+        maxReplicas: 7
+        groupName: tiny-llama-pack
         rayStartParams: {}
         template:
           spec:
             runtimeClassName: nvidia
             containers:
-              - name: llm
+              - name: tiny-llama
                 image: rayproject/ray-ml:2.33.0.914af0-py311
                 resources:
                   limits:

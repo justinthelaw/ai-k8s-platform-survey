@@ -1,1 +1,4 @@
 **/zarf*.tar.zst
+.mypy_cache
+.dmypy.json
+**/__pycache__

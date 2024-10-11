@@ -1,7 +1,7 @@
 apiVersion: ray.io/v1
 kind: RayService
 metadata:
-  name: hermes-2-pro
+  name: tiny-llama
 spec:
   serveConfigV2: |
     applications:
@@ -16,9 +16,9 @@ spec:
           # NOTE: num_gpus is set automatically based on TENSOR_PARALLELISM
       runtime_env:
         working_dir: "https://github.com/ray-project/kuberay/archive/master.zip"
-        pip: ["vllm==0.4.3"]
+        pip: ["vllm==0.5.4"]
         env_vars:
-          MODEL_ID: "defenseunicorns/Hermes-2-Pro-Mistral-7B-4bit-32g-GPTQ"
+          MODEL_ID: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
           TENSOR_PARALLELISM: "1"
           PIPELINE_PARALLELISM: "1"
   rayClusterConfig:
